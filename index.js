@@ -59,6 +59,7 @@ const requestLogger = (req, res, next) => {
 app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
+app.use(express.static('build'))
 
 app.get('/', (req, res) => {
     console.log({ headers: req.headers })
