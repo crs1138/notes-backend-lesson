@@ -5,6 +5,10 @@ const Note = require('./models/note')
 const { response } = require('express')
 const app = express()
 
+app.use(cors())
+app.use(express.static('build'))
+app.use(express.json())
+
 const requestLogger = (req, res, next) => {
     console.log('Method: ', req.method)
     console.log('Path: ', req.path)
@@ -12,11 +16,7 @@ const requestLogger = (req, res, next) => {
     console.log('---')
     next()
 }
-
-app.use(cors())
-app.use(express.json())
 app.use(requestLogger)
-app.use(express.static('build'))
 
 app.get('/', (req, res) => {
     console.log({ headers: req.headers })
@@ -32,46 +32,58 @@ app.get('/api/notes/', (req, res) => {
     })
 })
 
-app.get('/api/notes/:id', (req, res) => {
-    Note.findById(req.params.id).then((note) => {
-        console.log({ note })
-        res.json(note)
-    })
+app.get('/api/notes/:id', (req, res, next) => {
+    Note.findById(req.params.id)
+        .then((note) => {
+            if (!!note) {
+                res.json(note)
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch((err) => next(err))
 })
 
 app.delete('/api/notes/:id', (req, res) => {
-    const id = Number(req.params.id)
-    notes = notes.filter((note) => note.id !== id)
-
-    res.status(204).end()
+    Note.findByIdAndRemove(req.params.id)
+        .then((result) => {
+            res.status(204).end()
+        })
+        .catch((err) => next(err))
 })
 
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res, next) => {
     const body = req.body
-    if (!body.content) {
-        return res.status(400).json({ error: `Content missing` })
-    }
-
     const note = new Note({
         content: body.content,
         important: body.important || false,
         date: new Date(),
     })
 
-    note.save().then((savedNote) => {
-        res.json(savedNote)
-    })
+    note.save()
+        .then((savedNote) => {
+            res.json(savedNote)
+        })
+        .catch((err) => next(err))
 })
 
-app.put('/api/notes/:id', (req, res) => {
-    const body = req.body
-    const note = notes.find((note) => note.id === body.id)
-    const changedNote = { ...note, important: body.important }
-    notes = notes.map((note) => (note.id !== body.id ? note : changedNote))
-    console.log('notes :', notes)
-    console.log('changedNote :', changedNote)
+app.put('/api/notes/:id', (req, res, next) => {
+    const { content, important } = req.body
 
-    res.json(changedNote)
+    const note = {
+        content,
+        important,
+    }
+
+    Note.findByIdAndUpdate(req.params.id, note, {
+        new: true,
+        runValidators: true,
+        context: 'query',
+    })
+        .then((updatedNote) => {
+            res.json(updatedNote)
+        })
+        .catch((err) => next(err))
 })
 
 const unknownEndpoint = (req, res, next) => {
@@ -80,6 +92,19 @@ const unknownEndpoint = (req, res, next) => {
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: `malformatted id` })
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message })
+    }
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 
