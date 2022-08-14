@@ -10,7 +10,8 @@
         "build:ui": "rm -rf build && cd ../notes-frontend-lesson && npm run build && cp -r build ../notes-backend-lesson",
         "deploy": "git push heroku main",
         "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-        "logs:prod": "heroku logs --tail"
+        "logs:prod": "heroku logs --tail",
+        "lint": "eslint ."
     },
     "author": "Jan Pozivil",
     "license": "MIT",
@@ -21,6 +22,12 @@
         "mongoose": "^6.5.2"
     },
     "devDependencies": {
+        "eslint": "^8.22.0",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-jsx-a11y": "^6.6.1",
+        "eslint-plugin-react": "^7.30.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
         "nodemon": "^2.0.19"
     }
 }

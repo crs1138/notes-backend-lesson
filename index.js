@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const Note = require('./models/note')
-const { response } = require('express')
+
 const app = express()
 
 app.use(cors())
@@ -35,7 +35,7 @@ app.get('/api/notes/', (req, res) => {
 app.get('/api/notes/:id', (req, res, next) => {
     Note.findById(req.params.id)
         .then((note) => {
-            if (!!note) {
+            if (note) {
                 res.json(note)
             } else {
                 res.status(404).end()
@@ -44,7 +44,7 @@ app.get('/api/notes/:id', (req, res, next) => {
         .catch((err) => next(err))
 })
 
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res, next) => {
     Note.findByIdAndRemove(req.params.id)
         .then((result) => {
             res.status(204).end()
@@ -53,7 +53,7 @@ app.delete('/api/notes/:id', (req, res) => {
 })
 
 app.post('/api/notes', (req, res, next) => {
-    const body = req.body
+    const { body } = req
     const note = new Note({
         content: body.content,
         important: body.important || false,
@@ -97,7 +97,7 @@ const errorHandler = (error, req, res, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return res.status(400).send({ error: `malformatted id` })
+        return res.status(400).send({ error: 'malformatted id' })
     } else if (error.name === 'ValidationError') {
         return res.status(400).send({ error: error.message })
     }
