@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest --verbose",
         "build:ui": "rm -rf build && cd ../notes-frontend-lesson && npm run build && cp -r build ../notes-backend-lesson",
         "deploy": "git push heroku main",
         "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
@@ -28,6 +28,7 @@
         "eslint-plugin-jsx-a11y": "^6.6.1",
         "eslint-plugin-react": "^7.30.1",
         "eslint-plugin-react-hooks": "^4.6.0",
+        "jest": "^28.1.3",
         "nodemon": "^2.0.19"
     }
 }
