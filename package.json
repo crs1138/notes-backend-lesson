@@ -4,9 +4,9 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js",
-        "test": "jest --verbose",
+        "start": "NODE_ENV=production node index.js",
+        "dev": "NODE_ENV=development nodemon index.js",
+        "test": "NODE_ENV=test jest --verbose --runInBand --forceExit",
         "build:ui": "rm -rf build && cd ../notes-frontend-lesson && npm run build && cp -r build ../notes-backend-lesson",
         "deploy": "git push heroku main",
         "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
@@ -19,6 +19,7 @@
         "cors": "^2.8.5",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
+        "express-async-errors": "^3.1.1",
         "mongoose": "^6.5.2"
     },
     "devDependencies": {
@@ -29,6 +30,7 @@
         "eslint-plugin-react": "^7.30.1",
         "eslint-plugin-react-hooks": "^4.6.0",
         "jest": "^28.1.3",
-        "nodemon": "^2.0.19"
+        "nodemon": "^2.0.19",
+        "supertest": "^6.2.4"
     }
 }
