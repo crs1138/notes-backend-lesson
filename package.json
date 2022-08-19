@@ -7,6 +7,7 @@
         "start": "NODE_ENV=production node index.js",
         "dev": "NODE_ENV=development nodemon index.js",
         "test": "NODE_ENV=test jest --verbose --runInBand --forceExit",
+        "test:watch": "NODE_ENV=test jest --verbose --runInBand --forceExit --watch",
         "build:ui": "rm -rf build && cd ../notes-frontend-lesson && npm run build && cp -r build ../notes-backend-lesson",
         "deploy": "git push heroku main",
         "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
@@ -16,6 +17,7 @@
     "author": "Jan Pozivil",
     "license": "MIT",
     "dependencies": {
+        "bcrypt": "^5.0.1",
         "cors": "^2.8.5",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
