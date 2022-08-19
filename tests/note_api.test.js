@@ -3,11 +3,14 @@ const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 const Note = require('../models/note')
+const User = require('../models/user')
 const api = supertest(app)
 
 beforeEach(async () => {
     await Note.deleteMany({})
     await Note.insertMany(helper.initialNotes)
+    await User.deleteMany({})
+    await helper.generateDefaultUser()
 })
 
 describe('when there are initially some notes saved', () => {
@@ -59,6 +62,8 @@ describe('viewing a specific note', () => {
 
 describe('addition of a new note', () => {
     test('succeed with valid data', async () => {
+        const token = await helper.getAuthToken()
+
         const newNote = {
             content: 'async/await simplifies making async calls',
             important: true,
@@ -66,6 +71,7 @@ describe('addition of a new note', () => {
 
         await api
             .post('/api/notes')
+            .set('Authorization', `Bearer ${token}`)
             .send(newNote)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -78,15 +84,35 @@ describe('addition of a new note', () => {
     })
 
     test('fails with status code 400 if data invalid', async () => {
+        const token = await helper.getAuthToken()
         const newNote = {
             important: true,
         }
 
-        await api.post('/api/notes').send(newNote).expect(400)
+        await api
+            .post('/api/notes')
+            .set('Authorization', `Bearer ${token}`)
+            .send(newNote)
+            .expect(400)
 
         const notesAtEnd = await helper.notesInDb()
 
         expect(notesAtEnd).toHaveLength(helper.initialNotes.length)
+    })
+
+    test('fails if auth token missing', async () => {
+        const newNote = {
+            content: 'No token, no fun!',
+            important: true,
+        }
+
+        const result = await api
+            .post('/api/notes')
+            .send(newNote)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+
+        expect(result.body.error).toContain('token missing')
     })
 })
 

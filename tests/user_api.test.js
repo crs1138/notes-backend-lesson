@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt')
+const mongoose = require('mongoose')
 const User = require('../models/user')
 const helper = require('./test_helper')
 const supertest = require('supertest')
@@ -8,11 +8,7 @@ const api = supertest(app)
 describe('when there is initially one user in db', () => {
     beforeEach(async () => {
         await User.deleteMany({})
-
-        const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({ username: 'root', passwordHash })
-
-        await user.save()
+        await helper.generateDefaultUser()
     })
 
     test('creation succeeds with a fresh username', async () => {
@@ -70,4 +66,8 @@ describe('viewing users', () => {
 
         expect(result.body).toMatchObject([{ username: 'root', notes: [] }])
     })
+})
+
+afterAll(() => {
+    mongoose.connection.close()
 })
