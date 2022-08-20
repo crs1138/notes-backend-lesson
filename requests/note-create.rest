@@ -1,0 +1,8 @@
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzMDBhNzFhNTdkYjk2YjE3OTVmOTA1NCIsImlhdCI6MTY2MDk4NzI5NH0.td09ta-1UNd7xkfeQkPMAJ0z2ljA5Z5Yr3kVhJPnjeY
+
+{
+    "content": "Notes are attributed to individual users according to their token",
+    "important": true
+}

@@ -33,7 +33,7 @@ const getTokenFrom = (req) => {
 }
 
 notesRouter.post('/', async (req, res, next) => {
-    const { content, important, userId } = req.body
+    const { content, important } = req.body
     const token = getTokenFrom(req)
     if (!token) {
         return res.status(401).json({ error: 'token missing' })
@@ -51,7 +51,7 @@ notesRouter.post('/', async (req, res, next) => {
         content,
         important: important || false,
         date: new Date(),
-        user: userId,
+        user: user._id,
     })
 
     try {
